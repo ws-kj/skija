@@ -24,6 +24,8 @@ size_t strlen(const char* str) {
     return len;
 }
 
+
+
 void vga_init() {
     vga_row = 0; 
     vga_column = 0;
@@ -35,8 +37,14 @@ void vga_init() {
             vga_buffer[index] = vga_entry(' ', vga_color);
         }
     }  
+}
 
-
+void vga_cursor(size_t x, size_t y) {
+    uint16_t pos = y * VGA_WIDTH + x;
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t) (pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
 }
 
 void vga_setcolor(uint8_t color) {
@@ -46,6 +54,8 @@ void vga_setcolor(uint8_t color) {
 void vga_putentry(char c, uint8_t color, size_t x, size_t y) {
     const size_t index = y * VGA_WIDTH + x;
     vga_buffer[index] = vga_entry(c, color);
+
+    vga_cursor(x, y);
 }
 
 void vga_putchar(char c) {
